@@ -192,11 +192,11 @@ function shareAction(action) {
 
     <!-- Bottom actions -->
     <section class="sidebar-section sidebar-actions">
-      <button class="secondary" @click="emit('clear-assignments')">Netejar castell</button>
+      <button class="danger-btn clear-btn" @dblclick="emit('clear-assignments')" title="Doble clic per netejar">Netejar castell</button>
 
       <!-- Share / export popup -->
       <div class="share-wrap">
-        <button @click="shareOpen = !shareOpen">Compartir</button>
+        <button class="share-btn" @click="shareOpen = !shareOpen">Compartir</button>
         <div v-if="shareOpen" class="share-popup">
           <button class="share-item" @click="shareAction('share')">🔗 Copiar enllaç</button>
           <button class="share-item" @click="shareAction('export-png')">🖼 Descarregar PNG</button>
@@ -438,6 +438,32 @@ select:focus, input[type="text"]:focus {
 /* Share popup */
 .share-wrap {
   position: relative;
+}
+
+.share-btn {
+  background: #1a6fc4;
+  width: 100%;
+  height: 100%;
+}
+
+.share-btn:hover {
+  background: #1558a0;
+}
+
+.clear-btn {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.85rem;
+  flex: 1;
+}
+
+.clear-btn:hover {
+  background: #a93226;
+}
+
+.share-wrap {
+  flex: 3;
 }
 
 .share-backdrop {
