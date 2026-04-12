@@ -1,0 +1,81 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #f5f0eb;
+  --color-surface: #ffffff;
+  --color-border: #d0c8bc;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b6560;
+  --color-accent: #c0392b;
+  --color-accent-hover: #a93226;
+  --color-position-empty: #e8ddd0;
+  --color-position-filled: #2ecc71;
+  --color-position-filled-text: #ffffff;
+  --color-position-hover: #c8e6c9;
+  --color-position-stroke: #8b7355;
+
+  --sidebar-width: 280px;
+  --font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.4rem 0.85rem;
+  background: var(--color-accent);
+  color: #fff;
+  transition: background 0.15s;
+}
+
+button:hover {
+  background: var(--color-accent-hover);
+}
+
+button.secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+button.secondary:hover {
+  background: var(--color-position-empty);
+}
+
+select, input[type="text"] {
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.6rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  width: 100%;
+}
+
+select:focus, input[type="text"]:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
