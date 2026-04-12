@@ -24,12 +24,15 @@ const emit = defineEmits([
   'clear-roster',
   'clear-assignments',
   'share',
+  'export-png',
+  'export-json',
 ])
 
-const search    = ref('')
-const addInput  = ref('')
-const editMode  = ref(false)
-const fileInput = ref(null)
+const search      = ref('')
+const addInput    = ref('')
+const editMode    = ref(false)
+const fileInput   = ref(null)
+const shareOpen   = ref(false)
 
 const assignedIds = computed(() => new Set(Object.values(props.assignments)))
 
@@ -62,6 +65,11 @@ function onRename(id, e) {
   const newName = e.target.value.trim()
   if (newName) emit('rename-casteller', { id, newName })
   else e.target.value = props.roster.find(c => c.id === id)?.name ?? ''
+}
+
+function shareAction(action) {
+  shareOpen.value = false
+  emit(action)
 }
 </script>
 
@@ -112,41 +120,26 @@ function onRename(id, e) {
     <!-- Roster -->
     <section class="sidebar-section roster-section">
 
-      <!-- Header row -->
-      <div class="roster-header">
-        <label class="field-label">Castellers/es</label>
-        <button
-          class="secondary icon-btn"
-          :class="{ active: editMode }"
-          @click="editMode = !editMode"
-        >
-          {{ editMode ? 'Fet' : 'Editar llista' }}
-        </button>
-      </div>
+      <label class="field-label">Castellers/es</label>
 
-      <!-- Add input (pinned, never scrolls away) -->
-      <div class="add-row">
-        <input
-          v-model="addInput"
-          type="text"
-          placeholder="Afegir casteller/a…"
-          @keydown="onAddKeydown"
-        />
-        <button class="add-btn" title="Afegir" @click="onAddCasteller">+</button>
-      </div>
-
-      <!-- Bulk actions -->
+      <!-- Action bar: default | edit mode -->
       <div class="roster-actions">
-        <input
-          ref="fileInput"
-          type="file"
-          accept=".csv,text/csv"
-          style="display:none"
-          @change="onFileChange"
-        />
-        <button class="secondary icon-btn" title="Importa CSV" @click="triggerImport">↑ CSV</button>
-        <button class="secondary icon-btn" title="Exporta CSV" @click="emit('export-csv')">↓ CSV</button>
-        <button class="secondary icon-btn" title="Netejar llista" @click="emit('clear-roster')">Netejar</button>
+        <template v-if="!editMode">
+          <input
+            ref="fileInput"
+            type="file"
+            accept=".csv,text/csv"
+            style="display:none"
+            @change="onFileChange"
+          />
+          <button class="secondary icon-btn action-btn" title="Importa CSV" @click="triggerImport">↑ CSV</button>
+          <button class="secondary icon-btn action-btn" title="Exporta CSV" @click="emit('export-csv')">↓ CSV</button>
+          <button class="secondary icon-btn action-btn" @click="editMode = true">Editar llista</button>
+        </template>
+        <template v-else>
+          <button class="danger-btn action-btn" @click="emit('clear-roster')">Buidar llista</button>
+          <button class="secondary icon-btn action-btn" @click="editMode = false">Fet</button>
+        </template>
       </div>
 
       <!-- Search -->
@@ -155,6 +148,18 @@ function onRename(id, e) {
         type="text"
         placeholder="Cerca…"
       />
+
+      <!-- Add input: always visible, only active in edit mode -->
+      <div class="add-row" :class="{ 'add-row--disabled': !editMode }">
+        <input
+          v-model="addInput"
+          type="text"
+          placeholder="Afegir casteller/a…"
+          :disabled="!editMode"
+          @keydown="onAddKeydown"
+        />
+        <button class="add-btn" title="Afegir" :disabled="!editMode" @click="onAddCasteller">+</button>
+      </div>
 
       <!-- Roster list (scrollable) -->
       <ul class="roster-list">
@@ -188,7 +193,18 @@ function onRename(id, e) {
     <!-- Bottom actions -->
     <section class="sidebar-section sidebar-actions">
       <button class="secondary" @click="emit('clear-assignments')">Netejar castell</button>
-      <button @click="emit('share')">Compartir</button>
+
+      <!-- Share / export popup -->
+      <div class="share-wrap">
+        <button @click="shareOpen = !shareOpen">Compartir</button>
+        <div v-if="shareOpen" class="share-popup">
+          <button class="share-item" @click="shareAction('share')">🔗 Copiar enllaç</button>
+          <button class="share-item" @click="shareAction('export-png')">🖼 Descarregar PNG</button>
+          <button class="share-item" @click="shareAction('export-json')">&#123;&#125; Exportar JSON</button>
+        </div>
+        <!-- click-outside backdrop -->
+        <div v-if="shareOpen" class="share-backdrop" @click="shareOpen = false" />
+      </div>
     </section>
 
     <footer class="sidebar-footer">
@@ -202,7 +218,7 @@ function onRename(id, e) {
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
   height: 100%;
-  background: #2b2b2b;
+  background: #205b69;
   color: #e8e0d8;
   display: flex;
   flex-direction: column;
@@ -308,13 +324,37 @@ select:focus, input[type="text"]:focus {
   font-size: 1.1rem;
   line-height: 1;
   flex-shrink: 0;
+  background: #1a6fc4;
+  border-color: #1a6fc4;
+  color: #fff;
+}
+
+.add-btn:hover:not(:disabled) {
+  background: #1558a0;
+  border-color: #1558a0;
+}
+
+.add-btn:disabled {
+  background: #3a3a3a;
+  border-color: #555;
+  color: #666;
+  cursor: default;
+}
+
+.add-row--disabled input {
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* Bulk actions */
 .roster-actions {
   display: flex;
   gap: 0.4rem;
-  flex-wrap: wrap;
+}
+
+.action-btn {
+  flex: 1;
+  text-align: center;
 }
 
 .icon-btn {
@@ -393,5 +433,51 @@ select:focus, input[type="text"]:focus {
 .sidebar-footer a:hover {
   color: #e8e0d8;
   text-decoration: underline;
+}
+
+/* Share popup */
+.share-wrap {
+  position: relative;
+}
+
+.share-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+}
+
+.share-popup {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  background: #1e1e1e;
+  border: 1px solid #555;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.share-item {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: #e8e0d8;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.share-item:hover {
+  background: #2e2e2e;
+}
+
+.share-item + .share-item {
+  border-top: 1px solid #3a3a3a;
 }
 </style>

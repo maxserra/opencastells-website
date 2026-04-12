@@ -57,7 +57,7 @@ function onDblClick() {
       :width="position.r * 2.8"
       :height="position.r * 1.6"
       :rx="4"
-      :transform="`rotate(${position.direction}, ${position.x}, ${position.y})`"
+      :transform="`rotate(${position.direction ?? 0}, ${position.x}, ${position.y})`"
       :class="['slot-rect', casteller ? 'filled' : 'empty', { hovering: dragOver }]"
     />
     <!-- Circle shape (default) -->

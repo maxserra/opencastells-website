@@ -33,7 +33,7 @@ const FLOOR_NAMES    = ['Baix', 'Segon', 'Terç', 'Quart', 'Cinquè', 'Sisè', '
 const FLOOR_PREFIXES = ['b',    's',     't',    'q',     'c',      'x',   'se',  'vu',   'no']
 
 /** Number of fixed top slots for a given baixosCount. */
-const topSlots = (baixosCount) => baixosCount >= 2 ? 3 : 2
+const topSlots = (baixosCount) => baixosCount >= 2 ? 3 : 1
 
 function floorPositions(baixosCount, floorNum) {
   const name   = FLOOR_NAMES[floorNum - 1]    ?? `Pis ${floorNum}`
@@ -90,12 +90,11 @@ export function buildFormation(baixosCount, floorCount) {
   }
 
   if (baixosCount >= 2) {
-    troncPositions.push(...dosesPositions(regular + 0))
+    troncPositions.push(...dosesPositions(regular))
     troncPositions.push(acotxadoraPosition(regular + 1))
     troncPositions.push(enxanetaPosition(regular + 2))
   } else {
-    troncPositions.push(acotxadoraPosition(regular + 0))
-    troncPositions.push(enxanetaPosition(regular + 1))
+    troncPositions.push(enxanetaPosition(regular))
   }
 
   return {
@@ -105,4 +104,4 @@ export function buildFormation(baixosCount, floorCount) {
 }
 
 export const BAIXOS_OPTIONS = [1, 2, 3, 4]
-export const FLOOR_OPTIONS  = [5, 6, 7, 8, 9]
+export const FLOOR_OPTIONS  = [4, 5, 6, 7, 8, 9]

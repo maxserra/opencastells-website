@@ -1,10 +1,13 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import TheSidebar from './components/TheSidebar.vue'
 import FormationCanvas from './components/FormationCanvas.vue'
 import { useFormation } from './composables/useFormation.js'
 import { useRoster } from './composables/useRoster.js'
 import { pushStateToHash, readStateFromHash } from './composables/useShareableUrl.js'
+import { domToPng } from 'modern-screenshot'
+
+const canvasRef = ref(null)
 
 const {
   baixosCount,
@@ -49,6 +52,13 @@ const resolvedAssignments = computed(() => {
 
 // ── Handlers ──────────────────────────────────────────────────────────────────
 
+const fileName = (ext) => (title.value?.trim() || 'castell') + '.' + ext
+
+function triggerDownload(url, name) {
+  const a = Object.assign(document.createElement('a'), { href: url, download: name })
+  a.click()
+}
+
 function handleRemoveCasteller(id) {
   unassignCasteller(id)
   removeCasteller(id)
@@ -60,12 +70,9 @@ function handleClearRoster() {
 }
 
 function handleExportCsv() {
-  const csv = exportCsv()
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
-  a.download = 'castellers.csv'
-  a.click()
-  URL.revokeObjectURL(a.href)
+  const url = URL.createObjectURL(new Blob([exportCsv()], { type: 'text/csv' }))
+  triggerDownload(url, 'castellers.csv')
+  URL.revokeObjectURL(url)
 }
 
 async function share() {
@@ -76,6 +83,28 @@ async function share() {
   } catch {
     prompt('Copia aquest enllaç:', window.location.href)
   }
+}
+
+async function handleExportPng() {
+  if (!canvasRef.value) return
+  try {
+    const el   = canvasRef.value
+    const scale = 2400 / el.getBoundingClientRect().width
+    const url = await domToPng(el, {
+      backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim() || '#f5f0eb',
+      scale,
+    })
+    triggerDownload(url, fileName('png'))
+  } catch (err) {
+    alert('No s\'ha pogut exportar la imatge.')
+    console.error(err)
+  }
+}
+
+function handleExportJson() {
+  const url = URL.createObjectURL(new Blob([JSON.stringify({ ...getState(), roster: roster.value }, null, 2)], { type: 'application/json' }))
+  triggerDownload(url, fileName('json'))
+  URL.revokeObjectURL(url)
 }
 
 // ── Restore from URL hash on load ─────────────────────────────────────────────
@@ -110,8 +139,10 @@ onMounted(async () => {
       @clear-roster="handleClearRoster"
       @clear-assignments="clearAssignments"
       @share="share"
+      @export-png="handleExportPng"
+      @export-json="handleExportJson"
     />
-    <main class="main-area">
+    <main class="main-area" ref="canvasRef">
       <FormationCanvas
         :formation="currentFormation"
         :assignments="resolvedAssignments"
