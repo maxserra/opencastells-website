@@ -1,28 +1,39 @@
 # OpenCastells
 
-Una eina de code obert per planificar **pinyes i troncs** dels vostres **castells**.
+Eina de codi obert per planificar **pinyes i troncs** dels vostres **castells**.
 
-Selecciona una formacio, improta el teus castellers desde un CSV, o afegeixlos un a un. Arrossega els castellers a la seva posicio, i a fer pinya!
+Selecciona una formació, importa els teus castellers des d'un CSV, o afegeix-los un a un. Arrossega els castellers a la seva posició, i a fer pinya!
 
-Un cop esitguis, export un arxiu PNG, o un link.
+Un cop estiguis, exporta un arxiu PNG, o un enllaç.
+
+## Format CSV
+
+Per importar castellers, prepara un arxiu de text (`.csv` o `.txt`) amb **un nom per línia**, codificat en **UTF-8**. Els espais al principi i al final de cada línia s'ignoren.
+
+**Exemple:**
+```
+Joan Ferrer
+María García
+Pere López
+```
 
 ## Tech stack
 
-- [Vue 3](https://vuejs.org/) — Composition API with `<script setup>`
-- [Vite](https://vitejs.dev/) — dev server and build tool
-- [fflate](https://github.com/101arrowz/fflate) — compression for URL state encoding
-- [@vueuse/core](https://vueuse.org/) — Vue utilities
-- [GitHub Pages](https://pages.github.com/) — static hosting
-- [GitHub Actions](https://github.com/features/actions) — automated deployment on push to `main`
+- [Vue 3](https://vuejs.org/) — Composition API amb `<script setup>`
+- [Vite](https://vitejs.dev/) — servidor de desenvolupament i eina de construcció
+- [fflate](https://github.com/101arrowz/fflate) — compressió per a l'encodificació d'estat a URL
+- [@vueuse/core](https://vueuse.org/) — utilitats Vue
+- [GitHub Pages](https://pages.github.com/) — allotjament estàtic
+- [GitHub Actions](https://github.com/features/actions) — desplegament automatitzat en push a `main`
 
-## Local development
+## Desenvolupament local
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Build
+## Compilar
 
 ```bash
 npm run build      # output in dist/
@@ -31,18 +42,18 @@ npm run preview    # preview the production build locally
 
 ## Deployment
 
-Pushing to `main` triggers the GitHub Actions workflow (`.github/workflows/deploy.yml`), which builds and deploys to GitHub Pages automatically.
+Fent push a `main` es dispara el workflow de GitHub Actions (`.github/workflows/deploy.yml`), que compila i publica a GitHub Pages automàticament.
 
-## Shareable URLs
+## URLs compartibles
 
-The current formation state (formation type, title, casteller assignments) is encoded in the URL hash using the pipeline:
+L'estat actual de la formació (tipus de formació, títol, assignacions de castellers) es codifica al hash de l'URL mitjançant el pipeline:
 
 ```
 JSON → deflate (fflate) → base64url → #hash
 ```
 
-Click "Compartir" to encode the current state and copy the URL to the clipboard.
+Feu clic a "Compartir" per codificar l'estat actual i copiar l'URL al porta-retalls.
 
 ---
 
-*Inspirat en [B-Pinya](https://bpinya.cat/), respecte i credits a [Calero](https://calero.dev/) per la inspiració.*
+*Inspirat en [B-Pinya](https://bpinya.cat/), amb respecte i crèdits a [Calero](https://calero.dev/) per la inspiració.*

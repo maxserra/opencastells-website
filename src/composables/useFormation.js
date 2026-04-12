@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { buildFormation, BAIXOS_OPTIONS, FLOOR_OPTIONS } from '../data/formations.js'
+import { buildFormation, BAIXOS_OPTIONS, FLOOR_OPTIONS } from '../data/troncFormations.js'
 
 /**
  * Manages the two formation parameters and per-position casteller assignments.
