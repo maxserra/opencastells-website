@@ -215,8 +215,8 @@ function shareAction(action) {
 
 <style scoped>
 .sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
+  width: 100%;
+  min-width: 0;
   height: 100%;
   background: #205b69;
   color: #e8e0d8;

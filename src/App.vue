@@ -116,10 +116,13 @@ onMounted(async () => {
     if (state.roster) roster.value = state.roster
   }
 })
+
+const sidebarOpen = ref(true)
 </script>
 
 <template>
   <div class="app-layout">
+    <div class="sidebar-wrapper" :class="{ collapsed: !sidebarOpen }">
     <TheSidebar
       :baixos-count="baixosCount"
       :floor-count="floorCount"
@@ -142,7 +145,9 @@ onMounted(async () => {
       @export-png="handleExportPng"
       @export-json="handleExportJson"
     />
+    </div>
     <main class="main-area" ref="canvasRef">
+      <button class="sidebar-toggle" @click="sidebarOpen = !sidebarOpen" :title="sidebarOpen ? 'Amaga la barra' : 'Mostra la barra'">{{ sidebarOpen ? '◀' : '▶' }}</button>
       <FormationCanvas
         :formation="currentFormation"
         :assignments="resolvedAssignments"
@@ -161,9 +166,46 @@ onMounted(async () => {
   width: 100%;
 }
 
+.sidebar-wrapper {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+
+.sidebar-wrapper.collapsed {
+  width: 0;
+}
+
 .main-area {
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+}
+
+.sidebar-toggle:hover {
+  opacity: 1;
+  background: var(--color-surface);
 }
 </style>
