@@ -16,7 +16,7 @@ function toBase64Url(bytes) {
 
 /** base64url decode */
 function fromBase64Url(str) {
-  const padded = str.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice((str.length + 3) % 4 || 4)
+  const padded = str.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - str.length % 4) % 4)
   const binary = atob(padded)
   return Uint8Array.from(binary, c => c.charCodeAt(0))
 }

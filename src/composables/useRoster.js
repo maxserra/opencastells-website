@@ -7,6 +7,15 @@ import { ref } from 'vue'
  * IDs are stable UUIDs — used as foreign keys in assignment state.
  * Names are display-only and can be changed without affecting assignments.
  */
+/** Generate a 4-hex-digit ID that doesn't collide with existing IDs. */
+function generateId(existing) {
+  let id
+  do {
+    id = Math.floor(Math.random() * 0x10000).toString(16).padStart(4, '0')
+  } while (existing.has(id))
+  return id
+}
+
 export function useRoster() {
   const roster = ref([])
 
@@ -14,7 +23,8 @@ export function useRoster() {
     const trimmed = name.trim()
     if (!trimmed) return
     if (roster.value.some(c => c.name === trimmed)) return
-    roster.value.push({ id: crypto.randomUUID(), name: trimmed })
+    const existingIds = new Set(roster.value.map(c => c.id))
+    roster.value.push({ id: generateId(existingIds), name: trimmed })
   }
 
   function removeCasteller(id) {
