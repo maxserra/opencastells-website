@@ -122,26 +122,6 @@ function shareAction(action) {
 
       <label class="field-label">Castellers/es</label>
 
-      <!-- Action bar: default | edit mode -->
-      <div class="roster-actions">
-        <template v-if="!editMode">
-          <input
-            ref="fileInput"
-            type="file"
-            accept=".csv,text/csv"
-            style="display:none"
-            @change="onFileChange"
-          />
-          <button class="secondary icon-btn action-btn" title="Importa CSV" @click="triggerImport">↑ CSV</button>
-          <button class="secondary icon-btn action-btn" title="Exporta CSV" @click="emit('export-csv')">↓ CSV</button>
-          <button class="secondary icon-btn action-btn" @click="editMode = true">Editar llista</button>
-        </template>
-        <template v-else>
-          <button class="danger-btn action-btn" @click="emit('clear-roster')">Buidar llista</button>
-          <button class="secondary icon-btn action-btn" @click="editMode = false">Fet</button>
-        </template>
-      </div>
-
       <!-- Search -->
       <input
         v-model="search"
@@ -188,6 +168,26 @@ function shareAction(action) {
           Cap casteller/a
         </li>
       </ul>
+
+      <!-- Action bar: default | edit mode -->
+      <div class="roster-actions">
+        <template v-if="!editMode">
+          <input
+            ref="fileInput"
+            type="file"
+            accept=".csv,text/csv"
+            style="display:none"
+            @change="onFileChange"
+          />
+          <button class="secondary icon-btn action-btn" title="Importa CSV" @click="triggerImport">Importa CSV</button>
+          <button class="secondary icon-btn action-btn" title="Exporta CSV" @click="emit('export-csv')">Exporta CSV</button>
+          <button class="secondary icon-btn action-btn" @click="editMode = true">Editar llista</button>
+        </template>
+        <template v-else>
+          <button class="danger-btn action-btn" @click="emit('clear-roster')">Buidar llista</button>
+          <button class="secondary icon-btn action-btn" @click="editMode = false">Fet</button>
+        </template>
+      </div>
     </section>
 
     <!-- Bottom actions -->
