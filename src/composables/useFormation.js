@@ -5,7 +5,7 @@ import { buildFormation, BAIXOS_OPTIONS, FLOOR_OPTIONS } from '../data/troncForm
  * Manages the two formation parameters and per-position casteller assignments.
  */
 export function useFormation() {
-  const baixosCount = ref(3)
+  const baixosCount = ref(4)
   const floorCount  = ref(7)
   const title       = ref('')
 
