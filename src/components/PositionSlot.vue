@@ -8,6 +8,28 @@ const props = defineProps({
 
 const isRect = computed(() => props.position.shape === 'rect')
 
+// Split casteller into [firstName, surname(s)] for two-line display
+const castellerLines = computed(() => {
+  if (!props.casteller) return []
+  const parts = props.casteller.trim().split(/\s+/)
+  if (parts.length <= 1) return [props.casteller]
+  return [parts[0], parts.slice(1).join(' ')]
+})
+
+// Scale font size so the longest line fits within the slot's usable width.
+// Rect slots have a wider face (r*2.8); circles use diameter (r*2).
+// ~0.58 is a good average char-width / font-size ratio for the sans-serif used.
+const dynamicFontSize = computed(() => {
+  const r = props.position.r
+  const usableWidth = isRect.value ? r * 2.4 : r * 1.75
+  const lines = props.casteller ? castellerLines.value : [props.position.label ?? '']
+  const isTwoLine = lines.length > 1
+  const baseSize = isTwoLine ? 9 : 11
+  const longestChars = Math.max(...lines.map(l => l.length))
+  const fitSize = usableWidth / (longestChars * 0.58)
+  return Math.min(baseSize, Math.max(6, fitSize))
+})
+
 // Text rotation along direction, corrected so it never renders upside-down
 const textRotation = computed(() => {
   let d = (props.position.direction ?? 0) % 360
@@ -76,8 +98,13 @@ function onDblClick() {
       dominant-baseline="middle"
       :transform="isRect ? `rotate(${textRotation}, ${position.x}, ${position.y})` : undefined"
       :class="['slot-text', casteller ? 'filled-text' : 'empty-text']"
+      :font-size="dynamicFontSize"
     >
-      {{ casteller ? casteller.split(' ')[0] : position.label }}
+      <template v-if="casteller && castellerLines.length > 1">
+        <tspan :x="position.x" dy="-0.55em">{{ castellerLines[0] }}</tspan>
+        <tspan :x="position.x" dy="1.1em">{{ castellerLines[1] }}</tspan>
+      </template>
+      <template v-else>{{ casteller ? castellerLines[0] : position.label }}</template>
     </text>
   </g>
 </template>
@@ -111,7 +138,6 @@ function onDblClick() {
 
 .slot-text {
   font-family: var(--font-family);
-  font-size: 11px;
   pointer-events: none;
   user-select: none;
 }
@@ -123,6 +149,5 @@ function onDblClick() {
 
 .empty-text {
   fill: var(--color-text-muted);
-  font-size: 10px;
 }
 </style>
