@@ -222,7 +222,7 @@ function shareAction(action) {
   color: #e8e0d8;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .sidebar-header {

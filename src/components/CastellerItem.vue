@@ -26,15 +26,13 @@ function onDragStart(e) {
 
 <style scoped>
 .casteller-item {
-  padding: 0.35rem 0.6rem;
+  padding: 0.25rem 0.6rem;
   border-radius: var(--radius);
   cursor: grab;
   user-select: none;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   transition: background 0.1s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .casteller-item:hover {
