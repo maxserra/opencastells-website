@@ -5,6 +5,7 @@ import PositionSlot from './PositionSlot.vue'
 const props = defineProps({
   positions: { type: Array, required: true },
   assignments: { type: Object, required: true },
+  highlightedPositionIds: { type: Object, default: () => new Set() },
 })
 
 defineEmits(['assign', 'unassign'])
@@ -20,9 +21,10 @@ const viewBox = computed(() => {
   for (const pos of props.positions) {
     const r = pos.r ?? 0
     const isRect = pos.shape === 'rect'
-    const w = isRect ? r * 2.8 : r * 2
-    const h = isRect ? r * 1.6 : r * 2
-    const extent = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2) // conservative for rotated rects
+    const isTrapezoid = pos.shape === 'trapezoid'
+    const w = (isRect || isTrapezoid) ? r * 2.8 : r * 2
+    const h = (isRect || isTrapezoid) ? r * 1.6 : r * 2
+    const extent = Math.sqrt((w / 2) ** 2 + (h / 2) ** 2) // conservative for rotated rects and trapezoids
 
     minX = Math.min(minX, pos.x - extent)
     maxX = Math.max(maxX, pos.x + extent)
@@ -52,6 +54,7 @@ const viewBox = computed(() => {
         :key="pos.id"
         :position="pos"
         :casteller="assignments[pos.id] ?? null"
+        :highlighted="highlightedPositionIds.has(pos.id)"
         @assign="(id, name) => $emit('assign', id, name)"
         @unassign="id => $emit('unassign', id)"
       />

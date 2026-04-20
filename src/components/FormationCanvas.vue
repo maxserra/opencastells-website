@@ -7,6 +7,7 @@ const props = defineProps({
   formation: { type: Object, required: true },
   assignments: { type: Object, required: true },
   title: { type: String, default: '' },
+  highlightedPositionIds: { type: Object, default: () => new Set() }, // Set<positionId>
 })
 
 const emit = defineEmits(['assign', 'unassign'])
@@ -29,6 +30,7 @@ const troncOpen = ref(true)
         class="view-pinya"
         :positions="formation.pinyaPositions"
         :assignments="assignments"
+        :highlighted-position-ids="highlightedPositionIds"
         @assign="(id, name) => emit('assign', id, name)"
         @unassign="id => emit('unassign', id)"
       />
@@ -39,6 +41,8 @@ const troncOpen = ref(true)
           class="view-tronc"
           :positions="formation.troncPositions"
           :assignments="assignments"
+          :highlighted-position-ids="highlightedPositionIds"
+          :separator="formation.troncSeparator ?? null"
           @assign="(id, name) => emit('assign', id, name)"
           @unassign="id => emit('unassign', id)"
         />

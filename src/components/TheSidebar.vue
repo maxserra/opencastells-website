@@ -3,19 +3,22 @@ import { ref, computed } from 'vue'
 import CastellerItem from './CastellerItem.vue'
 
 const props = defineProps({
-  baixosCount:   { type: Number, required: true },
+  baixosCount:   { type: String, required: true },
   floorCount:    { type: Number, required: true },
   baixosOptions: { type: Array,  required: true },
+  baixosLabels:  { type: Object, required: true },
   floorOptions:  { type: Array,  required: true },
   title:         { type: String, default: '' },
   roster:        { type: Array,  required: true }, // [{id, name}]
   assignments:   { type: Object, required: true }, // {positionId: castellerId}
+  search:        { type: String, default: '' },
 })
 
 const emit = defineEmits([
   'update:baixosCount',
   'update:floorCount',
   'update:title',
+  'update:search',
   'add-casteller',
   'remove-casteller',
   'rename-casteller',
@@ -27,8 +30,6 @@ const emit = defineEmits([
   'export-png',
   'export-json',
 ])
-
-const search      = ref('')
 const addInput    = ref('')
 const editMode    = ref(false)
 const fileInput   = ref(null)
@@ -37,7 +38,7 @@ const shareOpen   = ref(false)
 const assignedIds = computed(() => new Set(Object.values(props.assignments)))
 
 const filteredRoster = computed(() =>
-  props.roster.filter(c => c.name.toLowerCase().includes(search.value.toLowerCase()))
+  props.roster.filter(c => c.name.toLowerCase().includes(props.search.toLowerCase()))
 )
 
 function onAddCasteller() {
@@ -86,9 +87,9 @@ function shareAction(action) {
           <label class="field-label">Baixos</label>
           <select
             :value="baixosCount"
-            @change="emit('update:baixosCount', Number($event.target.value))"
+            @change="emit('update:baixosCount', $event.target.value)"
           >
-            <option v-for="n in baixosOptions" :key="n" :value="n">{{ n }}</option>
+            <option v-for="n in baixosOptions" :key="n" :value="n">{{ baixosLabels[n] }}</option>
           </select>
         </div>
         <div class="de-sep">de</div>
@@ -102,11 +103,6 @@ function shareAction(action) {
           </select>
         </div>
       </div>
-
-      <label class="field-label-check field-label--disabled">
-        <input type="checkbox" disabled />
-        Amb agulla
-      </label>
 
       <label class="field-label mt">Títol (opcional)</label>
       <input
@@ -124,9 +120,10 @@ function shareAction(action) {
 
       <!-- Search -->
       <input
-        v-model="search"
+        :value="search"
         type="text"
         placeholder="Cerca…"
+        @input="emit('update:search', $event.target.value)"
       />
 
       <!-- Add input: always visible, only active in edit mode -->

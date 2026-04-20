@@ -1,11 +1,11 @@
 import { ref, computed } from 'vue'
-import { buildFormation, BAIXOS_OPTIONS, FLOOR_OPTIONS } from '../data/troncFormations.js'
+import { buildFormation, BAIXOS_OPTIONS, BAIXOS_LABELS, FLOOR_OPTIONS } from '../data/troncFormations.js'
 
 /**
  * Manages the two formation parameters and per-position casteller assignments.
  */
 export function useFormation() {
-  const baixosCount = ref(4)
+  const baixosCount = ref('4')
   const floorCount  = ref(7)
   const title       = ref('')
 
@@ -84,6 +84,7 @@ export function useFormation() {
     assignments,
     currentFormation,
     BAIXOS_OPTIONS,
+    BAIXOS_LABELS,
     FLOOR_OPTIONS,
     setBaixosCount,
     setFloorCount,

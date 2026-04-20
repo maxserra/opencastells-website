@@ -59,12 +59,26 @@ function dosesPositions(regularFloors) {
   ]
 }
 
-function acotxadoraPosition(stepsAboveBase) {
-  return { id: 'acot', x: CXT, y: BY - stepsAboveBase * FH, r: RT, label: 'Acotxadora', shape: 'rect' }
+function acotxadoraPosition(stepsAboveBase, x = CXT, id = 'acot', label = 'Acotxadora') {
+  return { id, x, y: BY - stepsAboveBase * FH, r: RT, label: label, shape: 'rect' }
 }
 
 function enxanetaPosition(stepsAboveBase) {
   return { id: 'enxa', x: CXT, y: BY - stepsAboveBase * FH, r: Math.round(RT * 0.75), label: 'Enxaneta', shape: 'rect' }
+}
+
+/** Agulla column: single person per floor, placed one step right of the last regular column. */
+function agullaPositions(regularFloors, baixosCount) {
+  const spacing = RT * 3
+  const x = Math.round(CXT + RT * 0.5 + ((baixosCount - 1) / 2 + 1) * spacing)
+  return { x, positions: Array.from({ length: regularFloors }, (_, i) => ({
+    id:    i === 0 ? 'ba' : `ag${i + 1}`,
+    x,
+    y:     BY - i * FH,
+    r:     RT,
+    label: `${FLOOR_NAMES[i + 1]}\nde l\'agulla`,
+    shape: 'rect',
+  })) }
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -76,10 +90,11 @@ function enxanetaPosition(stepsAboveBase) {
  * @param {number} floorCount   total floors (min 5); includes top fixed slots
  * @returns {{ pinyaPositions, troncPositions }}
  */
-export function buildFormation(baixosCount, floorCount) {
-  const geom = pinyaGeometries[baixosCount]
-  if (!geom) throw new Error(`No pinya geometry defined for ${baixosCount} baixos`)
+export function buildFormation(baixosKey, floorCount) {
+  const geom = pinyaGeometries[baixosKey]
+  if (!geom) throw new Error(`No pinya geometry defined for '${baixosKey}'`)
 
+  const baixosCount = parseInt(baixosKey)
   const top     = topSlots(baixosCount)
   const regular = floorCount - top
 
@@ -97,11 +112,26 @@ export function buildFormation(baixosCount, floorCount) {
     troncPositions.push(enxanetaPosition(regular))
   }
 
+  if (baixosKey === '3a') {
+    const agulla = agullaPositions(regular, baixosCount)
+    troncPositions.push(...agulla.positions)
+    troncPositions.push(acotxadoraPosition(regular, agulla.x, 'acot', 'Enxaneta\nde l\'agulla'))
+  }
+
+  const spacing = RT * 3
+  const troncSeparator = baixosKey === '3a' ? {
+    x:  Math.round(CXT + ((baixosCount - 1) / 2) * spacing + spacing / 2 + RT * 0.25),
+    y1: BY - regular * FH - RT * 1.5,
+    y2: BY + RT * 1.5,
+  } : null
+
   return {
     pinyaPositions: [...geom.baixos, ...geom.pinya],
     troncPositions,
+    troncSeparator,
   }
 }
 
-export const BAIXOS_OPTIONS = [1, 2, 3, 4]
+export const BAIXOS_OPTIONS = ['1', '2', '3', '3a', '4']
+export const BAIXOS_LABELS  = { '1': 'pilar', '2': 'torre', '3': '3', '3a': '3 amb agulla', '4': '4' }
 export const FLOOR_OPTIONS  = [4, 5, 6, 7, 8, 9]

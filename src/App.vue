@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import TheSidebar from './components/TheSidebar.vue'
 import FormationCanvas from './components/FormationCanvas.vue'
 import { useFormation } from './composables/useFormation.js'
@@ -16,6 +16,7 @@ const {
   assignments,
   currentFormation,
   BAIXOS_OPTIONS,
+  BAIXOS_LABELS,
   FLOOR_OPTIONS,
   setBaixosCount,
   setFloorCount,
@@ -118,6 +119,28 @@ onMounted(async () => {
 })
 
 const sidebarOpen = ref(true)
+const search = ref('')
+
+// Feature 1: sync browser tab title with formation title
+watchEffect(() => {
+  document.title = title.value?.trim()
+    ? `${title.value.trim()} – OpenCastells`
+    : 'OpenCastells'
+})
+
+// Feature 2: position IDs whose casteller matches the current search
+const highlightedPositionIds = computed(() => {
+  const q = search.value.toLowerCase().trim()
+  if (!q) return new Set()
+  const matchingIds = new Set(
+    roster.value.filter(c => c.name.toLowerCase().includes(q)).map(c => c.id)
+  )
+  const posIds = new Set()
+  for (const [posId, cId] of Object.entries(assignments.value)) {
+    if (matchingIds.has(cId)) posIds.add(posId)
+  }
+  return posIds
+})
 </script>
 
 <template>
@@ -127,13 +150,16 @@ const sidebarOpen = ref(true)
       :baixos-count="baixosCount"
       :floor-count="floorCount"
       :baixos-options="BAIXOS_OPTIONS"
+      :baixos-labels="BAIXOS_LABELS"
       :floor-options="FLOOR_OPTIONS"
       :title="title"
       :roster="roster"
       :assignments="assignments"
+      :search="search"
       @update:baixos-count="setBaixosCount"
       @update:floor-count="setFloorCount"
       @update:title="title = $event"
+      @update:search="search = $event"
       @add-casteller="addCasteller"
       @remove-casteller="handleRemoveCasteller"
       @rename-casteller="({ id, newName }) => renameCasteller(id, newName)"
@@ -152,6 +178,7 @@ const sidebarOpen = ref(true)
         :formation="currentFormation"
         :assignments="resolvedAssignments"
         :title="title"
+        :highlighted-position-ids="highlightedPositionIds"
         @assign="assign"
         @unassign="unassign"
       />
