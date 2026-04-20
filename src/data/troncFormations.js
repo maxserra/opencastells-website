@@ -76,7 +76,7 @@ function agullaPositions(regularFloors, baixosCount) {
     x,
     y:     BY - i * FH,
     r:     RT,
-    label: `${FLOOR_NAMES[i + 1]}\nde l\'agulla`,
+    label: `${FLOOR_NAMES[i]}\nde l\'agulla`,
     shape: 'rect',
   })) }
 }
