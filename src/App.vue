@@ -90,7 +90,7 @@ async function handleExportPng() {
   if (!canvasRef.value) return
   try {
     const el   = canvasRef.value
-    const scale = 2400 / el.getBoundingClientRect().width
+    const scale = 4800 / el.getBoundingClientRect().width
     const url = await domToPng(el, {
       backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim() || '#f5f0eb',
       scale,
