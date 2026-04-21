@@ -94,8 +94,8 @@ export function buildFormation(baixosKey, floorCount) {
   const geom = pinyaGeometries[baixosKey]
   if (!geom) throw new Error(`No pinya geometry defined for '${baixosKey}'`)
 
-  const baixosCount = parseInt(baixosKey)
-  const top     = topSlots(baixosCount)
+  const baixosCount = baixosKey === '1 x3' ? 3 : parseInt(baixosKey)
+  const top     = baixosKey === '1 x3' ? 1 : topSlots(baixosCount) // Ensure top is 1 for '1 x3'
   const regular = floorCount - top
 
   const troncPositions = []
@@ -104,7 +104,18 @@ export function buildFormation(baixosKey, floorCount) {
     troncPositions.push(...floorPositions(baixosCount, floor))
   }
 
-  if (baixosCount >= 2) {
+  if (baixosKey === '1 x3') {
+    // Add three enxaneta positions next to each other
+    const spacing = RT * 3
+    for (let i = 0; i < 3; i++) {
+      troncPositions.push({
+        ...enxanetaPosition(regular),
+        x: Math.round(CXT + (i - 1) * spacing), // Adjust x position for each enxaneta
+        id: `enxa${i + 1}`,
+        label: `Enxaneta ${i + 1}`
+      })
+    }
+  } else if (baixosCount >= 2) {
     troncPositions.push(...dosesPositions(regular))
     troncPositions.push(acotxadoraPosition(regular + 1))
     troncPositions.push(enxanetaPosition(regular + 2))
@@ -132,6 +143,6 @@ export function buildFormation(baixosKey, floorCount) {
   }
 }
 
-export const BAIXOS_OPTIONS = ['1', '2', '3', '3a', '4']
-export const BAIXOS_LABELS  = { '1': 'pilar', '2': 'torre', '3': '3', '3a': '3 amb agulla', '4': '4' }
-export const FLOOR_OPTIONS  = [4, 5, 6, 7, 8, 9]
+export const BAIXOS_OPTIONS = ['1', '1 x3', '2', '3', '3a', '4']
+export const BAIXOS_LABELS  = {'1': 'pilar', '1 x3': '3ps', '2': 'torre', '3': '3', '3a': '3 amb agulla', '4': '4' }
+export const FLOOR_OPTIONS  = [3, 4, 5, 6, 7, 8, 9]
