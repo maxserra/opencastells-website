@@ -8,7 +8,7 @@ const props = defineProps({
   highlightedPositionIds: { type: Object, default: () => new Set() },
 })
 
-defineEmits(['assign', 'unassign'])
+defineEmits(['assign', 'unassign', 'move'])
 
 const viewBox = computed(() => {
   if (!props.positions?.length) return '0 0 320 320'
@@ -57,6 +57,7 @@ const viewBox = computed(() => {
         :highlighted="highlightedPositionIds.has(pos.id)"
         @assign="(id, name) => $emit('assign', id, name)"
         @unassign="id => $emit('unassign', id)"
+        @move="(from, to) => $emit('move', from, to)"
       />
     </svg>
   </div>

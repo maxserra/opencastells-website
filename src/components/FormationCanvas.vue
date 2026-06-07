@@ -10,7 +10,7 @@ const props = defineProps({
   highlightedPositionIds: { type: Object, default: () => new Set() }, // Set<positionId>
 })
 
-const emit = defineEmits(['assign', 'unassign'])
+const emit = defineEmits(['assign', 'unassign', 'move'])
 
 const troncOpen = ref(true)
 </script>
@@ -33,6 +33,7 @@ const troncOpen = ref(true)
         :highlighted-position-ids="highlightedPositionIds"
         @assign="(id, name) => emit('assign', id, name)"
         @unassign="id => emit('unassign', id)"
+        @move="(from, to) => emit('move', from, to)"
       />
 
       <div class="tronc-wrapper" :class="{ collapsed: !troncOpen }">
@@ -45,6 +46,7 @@ const troncOpen = ref(true)
           :separator="formation.troncSeparator ?? null"
           @assign="(id, name) => emit('assign', id, name)"
           @unassign="id => emit('unassign', id)"
+          @move="(from, to) => emit('move', from, to)"
         />
       </div>
     </div>

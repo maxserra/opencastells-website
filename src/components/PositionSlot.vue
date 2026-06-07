@@ -96,9 +96,65 @@ const textRotation = computed(() => {
   return d
 })
 
-const emit = defineEmits(['assign', 'unassign'])
+const emit = defineEmits(['assign', 'unassign', 'move'])
 
 const dragOver = ref(false)
+
+// Native HTML5 drag-and-drop doesn't fire `dragstart` on SVG shapes (SVGElement
+// has no `draggable` IDL property), so slot-to-slot dragging is implemented via
+// pointer events instead. This also gives us touch support for free.
+const DRAG_THRESHOLD = 6
+let pointerState = null
+
+function onPointerDown(e) {
+  if (!props.casteller) return
+  if (e.button !== 0 && e.pointerType === 'mouse') return
+  pointerState = {
+    startX: e.clientX,
+    startY: e.clientY,
+    dragging: false,
+    hoveredEl: null,
+  }
+  window.addEventListener('pointermove', onPointerMove)
+  window.addEventListener('pointerup', onPointerUp)
+  window.addEventListener('pointercancel', onPointerUp)
+}
+
+function onPointerMove(e) {
+  if (!pointerState) return
+  if (!pointerState.dragging) {
+    const dx = e.clientX - pointerState.startX
+    const dy = e.clientY - pointerState.startY
+    if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return
+    pointerState.dragging = true
+    document.body.classList.add('slot-dragging')
+  }
+  e.preventDefault()
+  const target = document.elementFromPoint(e.clientX, e.clientY)
+  const slotEl = target?.closest('[data-position-id]') ?? null
+  if (slotEl !== pointerState.hoveredEl) {
+    pointerState.hoveredEl?.classList.remove('pointer-hovering')
+    slotEl?.classList.add('pointer-hovering')
+    pointerState.hoveredEl = slotEl
+  }
+}
+
+function onPointerUp() {
+  if (!pointerState) return
+  const { dragging, hoveredEl } = pointerState
+  hoveredEl?.classList.remove('pointer-hovering')
+  document.body.classList.remove('slot-dragging')
+  window.removeEventListener('pointermove', onPointerMove)
+  window.removeEventListener('pointerup', onPointerUp)
+  window.removeEventListener('pointercancel', onPointerUp)
+  if (dragging && hoveredEl) {
+    const targetPositionId = hoveredEl.dataset.positionId
+    if (targetPositionId && targetPositionId !== props.position.id) {
+      emit('move', props.position.id, targetPositionId)
+    }
+  }
+  pointerState = null
+}
 
 function onDragOver(e) {
   e.preventDefault()
@@ -125,6 +181,8 @@ function onDblClick() {
 <template>
   <g
     class="position-slot"
+    :data-position-id="position.id"
+    @pointerdown="onPointerDown"
     @dragover="onDragOver"
     @dragleave="onDragLeave"
     @drop="onDrop"
@@ -191,6 +249,13 @@ function onDblClick() {
   transition: fill 0.15s;
 }
 
+.slot-circle.filled,
+.slot-rect.filled,
+.slot-path.filled {
+  cursor: grab;
+  touch-action: none;
+}
+
 .slot-circle.empty,
 .slot-rect.empty,
 .slot-path.empty {
@@ -205,7 +270,10 @@ function onDblClick() {
 
 .slot-circle.hovering,
 .slot-rect.hovering,
-.slot-path.hovering {
+.slot-path.hovering,
+.position-slot.pointer-hovering .slot-circle,
+.position-slot.pointer-hovering .slot-rect,
+.position-slot.pointer-hovering .slot-path {
   fill: var(--color-position-hover);
 }
 
@@ -218,6 +286,13 @@ function onDblClick() {
 .filled-text {
   fill: var(--color-position-filled-text);
   font-weight: 600;
+}
+
+.slot-circle.filled.hovering ~ .slot-text.filled-text,
+.slot-rect.filled.hovering ~ .slot-text.filled-text,
+.slot-path.filled.hovering ~ .slot-text.filled-text,
+.position-slot.pointer-hovering .slot-text.filled-text {
+  fill: var(--color-text);
 }
 
 .slot-circle.highlighted,

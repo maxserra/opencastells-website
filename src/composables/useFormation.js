@@ -46,6 +46,19 @@ export function useFormation() {
     assignments.value = next
   }
 
+  /** Move a casteller from one position to another, swapping with whoever is there. */
+  function move(sourcePositionId, targetPositionId) {
+    if (sourcePositionId === targetPositionId) return
+    const sourceCasteller = assignments.value[sourcePositionId]
+    if (sourceCasteller === undefined) return
+    const targetCasteller = assignments.value[targetPositionId]
+    const next = { ...assignments.value }
+    delete next[sourcePositionId]
+    if (targetCasteller !== undefined) next[sourcePositionId] = targetCasteller
+    next[targetPositionId] = sourceCasteller
+    assignments.value = next
+  }
+
   function clearAssignments() {
     assignments.value = {}
   }
@@ -90,6 +103,7 @@ export function useFormation() {
     setFloorCount,
     assign,
     unassign,
+    move,
     clearAssignments,
     unassignCasteller,
     getState,

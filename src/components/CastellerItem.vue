@@ -36,7 +36,8 @@ function onDragStart(e) {
 }
 
 .casteller-item:hover {
-  background: var(--color-position-empty);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .casteller-item.assigned {

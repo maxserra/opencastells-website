@@ -22,6 +22,7 @@ const {
   setFloorCount,
   assign,
   unassign,
+  move,
   clearAssignments,
   unassignCasteller,
   getState,
@@ -181,9 +182,15 @@ const highlightedPositionIds = computed(() => {
         :highlighted-position-ids="highlightedPositionIds"
         @assign="assign"
         @unassign="unassign"
+        @move="move"
       />
     </main>
   </div>
+
+  <p class="credit">
+    Developed with ❤️ in Berlin. See
+    <a href="https://github.com/maxserra/opencastells-website" target="_blank" rel="noopener">OpenCastells</a>.
+  </p>
 </template>
 
 <style scoped>
@@ -191,6 +198,27 @@ const highlightedPositionIds = computed(() => {
   display: flex;
   height: 100%;
   width: 100%;
+}
+
+.credit {
+  position: fixed;
+  bottom: 0.4rem;
+  right: 0.6rem;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius);
+  z-index: 5;
+}
+
+.credit a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.credit a:hover {
+  text-decoration: underline;
 }
 
 .sidebar-wrapper {

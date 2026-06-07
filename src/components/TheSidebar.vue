@@ -126,16 +126,15 @@ function shareAction(action) {
         @input="emit('update:search', $event.target.value)"
       />
 
-      <!-- Add input: always visible, only active in edit mode -->
-      <div class="add-row" :class="{ 'add-row--disabled': !editMode }">
+      <!-- Add input: only shown in edit mode -->
+      <div v-if="editMode" class="add-row">
         <input
           v-model="addInput"
           type="text"
           placeholder="Afegir casteller/a…"
-          :disabled="!editMode"
           @keydown="onAddKeydown"
         />
-        <button class="add-btn" title="Afegir" :disabled="!editMode" @click="onAddCasteller">+</button>
+        <button class="add-btn" title="Afegir" @click="onAddCasteller">+</button>
       </div>
 
       <!-- Roster list (scrollable) -->
@@ -204,9 +203,6 @@ function shareAction(action) {
       </div>
     </section>
 
-    <footer class="sidebar-footer">
-      <a href="https://github.com/maxserra/opencastells-website" target="_blank" rel="noopener">OpenCastells</a>
-    </footer>
   </aside>
 </template>
 
@@ -338,15 +334,10 @@ select:focus, input[type="text"]:focus {
   cursor: default;
 }
 
-.add-row--disabled input {
-  opacity: 0.4;
-  cursor: default;
-}
-
 /* Bulk actions */
 .roster-actions {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.25rem;
 }
 
 .action-btn {
@@ -355,8 +346,8 @@ select:focus, input[type="text"]:focus {
 }
 
 .icon-btn {
-  font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
 }
 
 .icon-btn.active {
@@ -394,7 +385,7 @@ select:focus, input[type="text"]:focus {
   color: #c0392b;
   border: 1px solid #c0392b;
   padding: 0.2rem 0.45rem;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   flex-shrink: 0;
 }
 
@@ -412,24 +403,6 @@ select:focus, input[type="text"]:focus {
 .sidebar-actions {
   flex-direction: row;
   gap: 0.5rem;
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  padding: 0.75rem 1rem;
-  font-size: 0.75rem;
-  color: #7a7068;
-  border-top: 1px solid #3a3a3a;
-}
-
-.sidebar-footer a {
-  color: #a09888;
-  text-decoration: none;
-}
-
-.sidebar-footer a:hover {
-  color: #e8e0d8;
-  text-decoration: underline;
 }
 
 /* Share popup */

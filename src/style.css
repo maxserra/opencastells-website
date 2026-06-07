@@ -1,3 +1,8 @@
+body.slot-dragging,
+body.slot-dragging * {
+  cursor: grabbing !important;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
